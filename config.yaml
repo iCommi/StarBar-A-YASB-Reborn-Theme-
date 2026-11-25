@@ -1,0 +1,454 @@
+# YASB subtle grey glass v3
+# Right side, from inner to outer: Systray | Battery/Volume/Wi-Fi/Brightness | Quick Settings/Notifications/Power
+watch_stylesheet: true
+watch_config: true
+debug: false
+update_check: true
+bars:
+  primary-bar:
+    enabled: true
+    screens:
+    - primary
+    class_name: yasb-bar
+    alignment:
+      position: top
+      align: center
+    animation:
+      enabled: true
+      duration: 300
+    blur_effect:
+      enabled: true
+      dark_mode: false
+      round_corners: false
+      border_color: None
+    window_flags:
+      always_on_top: true
+      windows_app_bar: true
+      hide_on_fullscreen: true
+    dimensions:
+      width: 100%
+      height: 38
+    padding:
+      top: 0
+      left: 0
+      bottom: 0
+      right: 0
+    widgets:
+      left:
+      - launcher-pill
+      - system-pill
+      - traffic-pill
+      center:
+      - clock
+      right:
+      - systray
+      - status-pill
+      - action-pill
+      - show_desktop
+widgets:
+  home:
+    type: yasb.home.HomeWidget
+    options:
+      label: <span></span>
+      menu_list:
+      - title: User Home
+        path: '~'
+      - title: Download
+        path: ~\Downloads
+      - title: Documents
+        path: ~\Documents
+      - title: Pictures
+        path: ~\Pictures
+      system_menu: true
+      power_menu: true
+      blur: true
+      round_corners: true
+      round_corners_type: normal
+      border_color: None
+      alignment: left
+      offset_left: -12
+  clock:
+    type: yasb.clock.ClockWidget
+    options:
+      label: '{%I:%M %p}<span>{alarm}</span>'
+      label_alt: '{%a, %d %b %I:%M %p}'
+      timezones: []  # empty = use system default timezone
+      calendar:
+        blur: true
+        round_corners: true
+        alignment: center
+        direction: down
+        extended: false
+        show_years: true
+        show_holidays: false
+        show_week_numbers: true
+        border_color: None
+      callbacks:
+        on_left: toggle_calendar
+        on_middle: toggle_label
+        on_right: context_menu
+  volume:
+    type: yasb.volume.VolumeWidget
+    options:
+      label: <span>{icon}</span>
+      label_alt: <span>{icon}</span>{level}
+      tooltip: true
+      icons:
+        muted: 
+        '10': 
+        '30': 
+        '60': 
+        '100': 
+      callbacks:
+        on_left: toggle_volume_menu
+        on_right: toggle_mute
+      audio_menu:
+        blur: true
+        round_corners: true
+        round_corners_type: normal
+        border_color: None
+        alignment: right
+        direction: down
+        show_apps: true
+        show_app_labels: false
+        show_app_icons: true
+        show_apps_expanded: false
+        app_icons:
+          toggle_down: 
+          toggle_up: 
+  notifications:
+    type: yasb.notifications.NotificationsWidget
+    options:
+      label: <span></span>
+      label_alt: '{count} notifications'
+      hide_empty: true
+      tooltip: false
+      callbacks:
+        on_left: toggle_notification
+        on_right: do_nothing
+        on_middle: do_nothing
+  power_menu:
+    type: yasb.power_menu.PowerMenuWidget
+    options:
+      label: <span></span>
+      uptime: true
+      show_user: true
+      menu_style: popup
+      popup:
+        blur: true
+        round_corners: true
+        round_corners_type: normal
+        border_color: None
+        alignment: right
+        offset_left: 12
+      profile_image_size: 64
+      buttons:
+        lock:
+        - "\uDB80\uDF41"
+        - Lock
+        signout:
+        - "\uDB80\uDF43"
+        - Sign out
+        sleep:
+        - "\uDB82\uDD04"
+        - Sleep
+        hibernate:
+        - "\uDB82\uDD01"
+        - Hibernate
+        restart:
+        - "\uDB81\uDC53"
+        - Restart
+        shutdown:
+        - "\uDB82\uDD06"
+        - Shut Down
+        cancel:
+        - ''
+        - Cancel
+  cpu:
+    type: yasb.cpu.CpuWidget
+    options:
+      label: <span></span> {info[percent][total]}%
+      label_alt: '{info[freq][current]} MHz'
+      update_interval: 2000
+      hide_decimal: true
+      menu:
+        enabled: true
+        show_graph: true
+        show_graph_grid: true
+        graph_history_size: 60
+        alignment: center
+      callbacks:
+        on_left: toggle_menu
+        on_middle: do_nothing
+        on_right: toggle_label
+  memory:
+    type: yasb.memory.MemoryWidget
+    options:
+      label: <span></span> {virtual_mem_percent}%
+      label_alt: <span></span> RAM {virtual_mem_percent}% · SWAP {swap_mem_percent}%
+      update_interval: 5000
+      hide_decimal: true
+      callbacks:
+        on_left: toggle_menu
+        on_middle: do_nothing
+        on_right: "exec powershell -WindowStyle Hidden -Command \"Start-Process 'C:\\Tools\\RAMMap64.exe' -ArgumentList '-Ew' -Verb RunAs\""
+      menu:
+        enabled: true
+        show_graph: true
+        show_graph_grid: true
+        graph_history_size: 60
+        alignment: center
+  quick_launch:
+    type: yasb.quick_launch.QuickLaunchWidget
+    options:
+      label: <span></span>
+      search_placeholder: Search applications...
+      max_results: 30
+      show_icons: true
+      icon_size: 16
+      compact_text: true
+      providers:
+        apps:
+          enabled: true
+          prefix: '*'
+          priority: 0
+          show_recent: true
+          max_recent: 5
+          show_description: true
+      popup:
+        width: 720
+        height: 480
+        blur: true
+        round_corners: true
+        round_corners_type: normal
+        border_color: None
+        dark_mode: true
+      callbacks:
+        on_left: toggle_quick_launch
+      keybindings:
+      - keys: alt+space
+        action: toggle_quick_launch
+        screen: primary
+  battery:
+    type: yasb.battery.BatteryWidget
+    options:
+      label: <span>{icon}</span> {percent}%
+      label_alt: '{percent}%'
+      update_interval: 5000
+      hide_unsupported: true
+      charging_options:
+        icon_format: '{charging_icon}'
+        blink_charging_icon: false
+        blink_interval: 500
+      status_icons:
+        icon_charging: 
+        icon_critical: 
+        icon_low: 
+        icon_medium: 
+        icon_high: 
+        icon_full: 
+  brightness:
+    type: yasb.brightness.BrightnessWidget
+    options:
+      label: <span>{icon}</span>
+      label_alt: <span>{icon}</span> {percent}%
+      tooltip: true
+      hide_unsupported: true
+      brightness_icons:
+      - 
+      - 
+      - 
+      - 
+      brightness_toggle_level:
+      - 0
+      - 50
+      - 100
+      brightness_menu:
+        blur: true
+        round_corners: true
+        round_corners_type: normal
+        border_color: None
+        alignment: right
+        direction: down
+        offset_top: 6
+        brightness_icon: 
+        contrast_icon: 
+      callbacks:
+        on_left: toggle_brightness_menu
+        on_right: toggle_label
+  traffic:
+    type: yasb.traffic.TrafficWidget
+  wifi:
+    type: yasb.wifi.WifiWidget
+    options:
+      label: <span>{wifi_icon}</span>
+      label_alt: <span>{wifi_icon}</span> {wifi_strength}%
+      update_interval: 5000
+      wifi_icons:
+      - 
+      - 
+      - 
+      - 
+      - 
+      ethernet_label: <span>{wifi_icon}</span>
+      ethernet_label_alt: <span>{wifi_icon}</span> {ip_addr}
+      ethernet_icon: 
+      callbacks:
+        on_left: "exec cmd.exe /c start ms-availablenetworks:"
+        on_middle: do_nothing
+        on_right: toggle_label
+      menu_config:
+        blur: true
+        round_corners: true
+        round_corners_type: normal
+        border_color: None
+        alignment: right
+        direction: down
+        offset_top: 6
+  notes:
+    type: yasb.notes.NotesWidget
+  systray:
+    type: yasb.systray.SystrayWidget
+    options:
+      class_name: systray
+      label_collapsed: 
+      label_expanded: 
+      label_position: left
+      icon_size: 14
+      pin_click_modifier: alt
+      show_unpinned: true
+      show_unpinned_button: true
+      show_in_popup: false
+      tooltip: true
+      use_hook: true
+  control_center:
+    type: yasb.control_center.ControlCenterWidget
+    options:
+      label: <span></span>
+      label_alt: <span></span>
+      tooltip: true
+      sections_order:
+      - system_controls
+      - quick_actions
+      - sliders
+      - power
+      - media
+      popup:
+        blur: true
+        round_corners: true
+        round_corners_type: normal
+        border_color: None
+        alignment: right
+        direction: down
+        offset_top: 8
+      sections:
+        system_controls:
+          show: true
+          profile_image_size: 32
+          power_icon: 
+          lock_icon: 
+          settings_icon: 
+        quick_actions:
+          show: true
+          columns: 3
+          label_position: default
+          actions:
+          - id: toggle_dnd
+            label: Focus
+            icon: 
+          - id: toggle_mute
+            label: Mute
+            icon: 
+          - id: toggle_mic_mute
+            label: Mic
+            icon: 
+          - id: screenshot
+            label: Capture
+            icon: 
+          - id: touch_keyboard
+            label: Keyboard
+            icon: 
+          - id: toggle_theme
+            label: Theme
+            icon: 
+        sliders:
+          show: true
+          brightness:
+            show_slider: true
+            icon: 
+            show_source_selector: true
+            source_selector_icon: 
+          volume:
+            show_slider: true
+            icon: 
+            show_source_selector: true
+            source_selector_icon: 
+          microphone:
+            show_slider: true
+            icon: 
+            show_source_selector: true
+            source_selector_icon: 
+        power:
+          show: true
+          power_plan_title: Power Plan
+          power_mode_title: Power Mode
+          button_menu_icon: 
+        media:
+          show: true
+          thumbnail_size: 40
+          thumbnail_radius: 8
+          icons:
+            prev_track: 
+            next_track: 
+            play: 
+            pause: 
+      callbacks:
+        on_left: toggle_menu
+  launcher-pill:
+    type: yasb.grouper.GrouperWidget
+    options:
+      class_name: launcher-pill
+      widgets:
+      - home
+      - quick_launch
+      - notes
+  system-pill:
+    type: yasb.grouper.GrouperWidget
+    options:
+      class_name: system-pill
+      widgets:
+      - cpu
+      - memory
+  traffic-pill:
+    type: yasb.grouper.GrouperWidget
+    options:
+      class_name: traffic-pill
+      widgets:
+      - traffic
+  action-pill:
+    type: yasb.grouper.GrouperWidget
+    options:
+      class_name: action-pill
+      widgets:
+      - control_center
+      - notifications
+      - power_menu
+  status-pill:
+    type: yasb.grouper.GrouperWidget
+    options:
+      class_name: status-pill
+      widgets:
+      - brightness
+      - wifi
+      - volume
+      - battery
+  show_desktop:
+    type: yasb.applications.ApplicationsWidget
+    options:
+      label: "{data}"
+      class_name: show-desktop
+      tooltip: true
+      app_list:
+        - icon: "\u00A0"
+          launch: "explorer.exe shell:::{3080F90D-D7AD-11D9-BD98-0000947B0257}"
+          name: Show desktop
